@@ -1,0 +1,118 @@
+---
+title: SA Assignment 2 Hockey Analysis (Pittsburgh Penguins)
+author: "David Sobek"
+date: "2023-11-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+For this assignment I have created visualizations and completed analysis on team statistics for my favorite hockey team, the Pittsburgh Penguins.
+
+```{r}
+library(fastRhockey)
+library(nhlapi)
+library(ggplot2) 
+library(ggdark) 
+library(ggimage) 
+library(reshape) 
+library(ggridges) 
+library(ggrepel) 
+library(tidyverse)
+```
+Load in Data
+```{r}
+nhl_game <- read.csv("data/game.csv")
+game_team_stats <- read.csv("data/game_teams_stats.csv")
+team <- read.csv("data/team_info.csv")
+```
+Join team and game team stats data frames
+```{r}
+games_stats <- game_team_stats %>%
+  inner_join(team, by = "team_id")
+```
+
+
+Filter data frame to Pittsburgh Penguins
+```{r}
+Pens.df <- games_stats %>%
+  filter(teamName == "Penguins")
+```
+
+
+Visualizations and Insights
+
+Goals v Wins bar chart
+```{r}
+Pen_plot <- ggplot(data = Pens.df, # Set data set
+                 aes(x = goals, # Set x-axis variable
+                     fill = "goals")) + # Set y-axis variable
+  geom_bar() + 
+  facet_wrap(~won)+
+  dark_theme_bw() + 
+  labs(x = "Number of Goals",
+       y = "Number of Games",
+       title = "PIT Goals scored in Games won vs Games lost")
+
+Pen_plot
+  
+```
+When looking at these bar charts of the Pittsburgh Penguins goals scored in games won versus games lost we can see that on average the penguins score ~3 goals in both wins and losses. Although hockey is typically a low scoring sport, many of the Penguins losses have come when they have scored 2 goals or less. Additionally, if the Pens are able to score more than 5 goals in a game, the win is almost guaranteed as they show almost no losses when scoring 5 goals or more.
+
+
+Giveaways in Home vs Away Games
+```{r}
+Pen_giveaways_plot <- ggplot(data = Pens.df, # Set data set
+                 aes(x = giveaways, # Set x-axis variable
+                     fill = "giveaways")) + # Set y-axis variable
+  geom_bar() + 
+  facet_wrap(~HoA)+
+  dark_theme_bw()+
+  labs(x = "Number of Giveaways",
+       y = "",
+       title = "PIT Giveaways in Home vs Away games")
+
+
+Pen_giveaways_plot
+```
+In the next set of visualizations, we can see the number of giveaways the Penguins had based on if they were playing at home or away. When we look at the away game plot, we are able to see that the penguins tend to give up the puck much more when they are not playing on their home ice. When playing at home, the pens have never given up the puck more than 17 times, however when playing away there are several instances the Penguins having 20+ giveaways in a game, and even some games where they have given up possession over 30 times.
+
+
+Overtime Hits vs Takeaways
+```{r}
+#Creation of Overtime Data Frame
+Pens.OT <- Pens.df %>%
+  filter(settled_in == "OT")
+```
+
+
+```{r}
+Pen_OT_plot <- ggplot(data = Pens.OT, # Set data set
+                 aes(x = hits, # Set x-axis variable
+                     y = takeaways)) + # Set y-axis variable
+  geom_point() + # Set geom point to create scatter plot
+  geom_smooth()+
+  facet_wrap(~won)+
+  dark_theme_bw()+
+  labs(x = "Number of Hits",
+       y = "Number of Takeaways",
+       title = "PIT Hits vs Takeaways in Overtime Games")
+
+
+
+Pen_OT_plot
+```
+In my final visualization, I created a scatter plot of the Pittsburgh Penguins' number of hits versus their number of Takeaways in games that were decided in Overtime. It is very interesting to me that in games which resulted in an OT loss for the penguins, there is a positive correlation between the number of hits and the number of takeaways. This seems almost paradoxical, because one would think that if a team is more physical and takes the puck away more,then they would ultimately win the game. It appears that this is not the case for the Penguins if the game were to go into overtime. Should a game go into overtime, the Penguins should focus more on an effective offense rather than physicality.
+
+
+
+
+
+
+
+
+

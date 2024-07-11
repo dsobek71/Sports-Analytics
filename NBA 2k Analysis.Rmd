@@ -1,0 +1,101 @@
+---
+title: "NBA 2k Analysis"
+author: "David Sobek"
+date: "2024-04-09"
+output: html_document
+---
+
+## Install Packages
+```{r}
+library(ggplot2)
+library(ggdark)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+```
+
+## Load in Data
+```{r}
+NBA2k <- read.csv("nba_rankings_2014-2020.csv")
+```
+
+```{r}
+# View first rows of data
+head(NBA2k)
+```
+
+
+The data set I have selected for this analysis is a data set which compares an NBA player's season statistics with their overall player rating in the NBA 2k video game. Game statistics range from the 2014-15 season to the 2019-20 season. In game player rankings are based on a scale of 0-100.
+
+## Visualizations
+```{r}
+## AVG Points Per Game Vs Player Rating
+points_plot <- ggplot(data = NBA2k,
+                   aes(x = PTS,
+                       y = rankings))+
+  geom_point()+
+  geom_smooth()+
+  dark_theme_bw()+
+  labs(x = "Player AVG Points Per Game",
+       y = "Player Rating",
+       title = "Player PPG vs Player 2K rating")
+
+points_plot
+```
+```{r}
+## finding outlier player
+ less5 <- NBA2k %>%
+  filter(PTS < 5 & rankings > 80)
+
+less5
+```
+
+This first Visualization is a scatter plot of an NBA player's points per game compared to their overall rating in the NBA 2k video game. When making this graph I expected there to b a strong positive correlation, and my assumptions were correct. As you can see, the more a player scores, the higher their in game rating will be. However, we can see a few outliers within this visualization. There is one player who's average points per game is less than 5, but still has a player rating in the high 80's. This player is Gordon Hayward from the 2017-18 season. After doing some outside research I found that he has this high ranking despite his low point value because he only played one quarter of the season opener before suffering a season ending fracture to his left leg.
+
+```{r}
+## Filtering to find players late in their career
+older33 <- NBA2k %>%
+  filter(AGE > 33)
+```
+
+```{r}
+## Distribution of Rankings for Older Players
+age_plot <- ggplot(data = older33,
+                   aes(x = rankings,
+                       fill = "rankings"))+
+  geom_bar()+
+  dark_theme_bw()+
+  labs(x = "Player Rankings",
+       y = "Count of players with ranking",
+       title = "distribution of Older Player's Rankings")
+
+age_plot
+```
+
+
+```{r}
+## find outlier player
+old_ballers <- older33 %>%
+  filter(rankings > 90)
+
+old_ballers
+```
+For my next visualization I wanted to see the distribution of player 2K rankings for players who are advanced in their career. I filtered my data set to only include players who were over the age of 33 and created a bar chart to see the distribution. When looking at this chart we can see that the bar chart is Right-Skewed, with most of the rankings for players older than 33 falling somewhere between 70 and 80. There are a few older players who have ratings in the mid to high 80's, but the most notable point of the chart is the two players older than 33 who have a player rating in the high 90's. These two players are actually the same player, LeBron James, who had a player rating of 97 in both the 2018-19 and 2019-20 seasons. This is understandable because LeBron James is one of if not the greatest player of all time and still performs at an incredibly high level despite his advanced age.
+
+## Research Objective
+My research objective for this data set is to determine which NBA player statistics have the greatest effect on their overall player rating. I hope to identify the significant metrics which improve or decrease player ranking, as well as determine if certain metrics with little effect on overall ranking can create undervalued players. This may include players with a mediocre ranking who have high defensive metrics or high 3 point shooting percentage. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
